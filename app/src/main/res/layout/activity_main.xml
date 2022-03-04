@@ -4,62 +4,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="340dp"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:hint="Username">
 
         <EditText
             android:id="@+id/t1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            tools:ignore="SpeakableTextPresentCheck" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="340dp"
-        android:layout_marginTop="10dp"
-        android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="340dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:hint="Password">
 
         <EditText
             android:id="@+id/t2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            tools:ignore="SpeakableTextPresentCheck" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/savebtn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_bg_style"
-        android:id="@+id/savebtn"
-        android:textSize="20sp"
         android:layout_marginTop="30dp"
-        android:text="Save to SP"/>
+        android:background="@drawable/button_bg_style"
+        android:text="Save to SP"
+        android:textSize="20sp" />
 
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/delbtn"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_bg_style"
-        android:id="@+id/delbtn"
-        android:textSize="20sp"
         android:layout_marginTop="30dp"
-        android:text="Delete from SP"/>
+        android:background="@drawable/button_bg_style"
+        android:text="Delete from SP"
+        android:textSize="20sp" />
 
     <TextView
+        android:id="@+id/tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv"
         android:layout_marginTop="20dp"
-        android:textSize="20dp"/>
+        android:textSize="20dp" />
+
+    <Button
+        android:id="@+id/mgrt_sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Migrate to SP" />
+
+    <Button
+        android:id="@+id/read_dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Read from DP" />
+
+    <Button
+        android:id="@+id/edit_dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit from DP" />
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

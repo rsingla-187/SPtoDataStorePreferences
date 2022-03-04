@@ -1,7 +1,5 @@
 package com.kazimasum.spdemo;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -12,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
@@ -20,69 +17,131 @@ import kotlinx.coroutines.BuildersKt;
 import kotlinx.coroutines.CoroutineStart;
 import kotlinx.coroutines.Dispatchers;
 import kotlinx.coroutines.GlobalScope;
-import kotlinx.coroutines.flow.FlowCollector;
 
-public class MainActivity extends AppCompatActivity
-{
-   EditText t1,t2;
-   Button savebtn, delbtn;
-   TextView tv;
-   MigrationManager migrationManager;
+import java.util.concurrent.atomic.AtomicReference;
+
+public class MainActivity extends AppCompatActivity {
+    EditText t1, t2;
+    Button savebtn, delbtn, mgrt_sp, read_dp, edit_dp;
+    TextView tv;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final Context context=getApplicationContext();
+        final Context context = getApplicationContext();
 
-        t1=(EditText)findViewById(R.id.t1);
-         t2=(EditText)findViewById(R.id.t2);
-         tv=(TextView)findViewById(R.id.tv);
-         savebtn=(Button)findViewById(R.id.savebtn);
-         delbtn=(Button)findViewById(R.id.delbtn);
+        t1 = (EditText) findViewById(R.id.t1);
+        t2 = (EditText) findViewById(R.id.t2);
+        tv = (TextView) findViewById(R.id.tv);
+        savebtn = (Button) findViewById(R.id.savebtn);
+        delbtn = (Button) findViewById(R.id.delbtn);
+        mgrt_sp = (Button) findViewById(R.id.mgrt_sp);
+        read_dp = (Button) findViewById(R.id.read_dp);
+        edit_dp = (Button) findViewById(R.id.edit_dp);
 
-             checkexistedrecord();
 
-             savebtn.setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View view) {
+           checkexistedrecord();
 
-                     /*SharedPreferences sp=context.getSharedPreferences("credentials",MODE_PRIVATE);
+        /*savebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-                  SharedPreferences.Editor editor=sp.edit();
-                    editor.putString("username",t1.getText().toString());
-                    editor.putString("password",t2.getText().toString());
-                    editor.apply();
-                    t1.setText("");
-                    t2.setText("");
+                SharedPreferences sp = context.getSharedPreferences("credentials", MODE_PRIVATE);
 
-                    tv.setTextColor(Color.GREEN);
-                    tv.setText("Insreted Successfully");*/
-                     migrateToPreferencesDataStore();
-                 }
-             });
-/*
-             delbtn.setOnClickListener(new View.OnClickListener() {
-                 @Override
-                 public void onClick(View view) {
-                     SharedPreferences sp=getSharedPreferences("credentials",MODE_PRIVATE);
-                     SharedPreferences.Editor editor=sp.edit();
-                     editor.clear();
-                     editor.apply();
-                     t1.setText("");
-                     t2.setText("");
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("username", t1.getText().toString());
+                editor.putString("password", t2.getText().toString());
+                editor.apply();
+                t1.setText("");
+                t2.setText("");
 
-                     tv.setTextColor(Color.GREEN);
-                     tv.setText("Deleted Successfully");
-                 }
-             });*/
+                tv.setTextColor(Color.GREEN);
+                tv.setText("Insreted Successfully");
+            }
+        });*/
+    /*    delbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences sp = getSharedPreferences("credentials", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.clear();
+                editor.apply();
+                t1.setText("");
+                t2.setText("");
+
+                tv.setTextColor(Color.GREEN);
+                tv.setText("Deleted Successfully");
+            }
+        });
+*/
+        mgrt_sp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MigrationManager.MigrateSp(context);
+                tv.setTextColor(Color.GREEN);
+                tv.setText("Migrated Successfully");
+            }
+        });
+
+       read_dp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AtomicReference<String> username = null;
+                BuildersKt.launch(GlobalScope.INSTANCE,
+                        Dispatchers.getIO(),//context to be ran on
+                        CoroutineStart.DEFAULT,
+                        (coroutineScope, continuation) -> {
+                            try {
+                                //String username = migrationManager.getValueFlow(migrationManager.USER_NAME, (Continuation<? super String>) continuation).collect((s, continuation1)->s,continuation);
+                                username.set( MigrationManager.getUserValueFlow(MigrationManager.USER_NAME, (Continuation<? super String>) continuation));
+                                if(username!=null)
+                                {
+                                    t1.setText((CharSequence) username);
+                                   // t2.setText(sp.getString("password",""));
+                                    tv.setTextColor(Color.GREEN);
+                                    tv.setText("Read Successfully");
+                                }
+                                else {
+                                    tv.setText("Record not found");
+                                    tv.setTextColor(Color.RED);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return username;
+                        }
+                );
+            }
+        });
+
+     /*   edit_dp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BuildersKt.launch(GlobalScope.INSTANCE,
+                        Dispatchers.getIO(),//context to be ran on
+                        CoroutineStart.DEFAULT,
+                        (coroutineScope, continuation) -> {
+                            try {
+
+                                MigrationManager.setValue(MigrationManager.USER_NAME, t2.getText().toString(), (Continuation<? super Unit>) continuation);
+                                tv.setTextColor(Color.GREEN);
+                                tv.setText("Edited Successfully");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+                );
+            }
+        });*/
 
     }
 
-    private void migrateToPreferencesDataStore() {
+    /*private void migrateToPreferencesDataStore() {
        // val USERNAME = preferencesKey<String>(username)
-        migrationManager = new MigrationManager(this);
 
+        MigrationManager.MigrateSp(this);
     }
 private void readdatastore()
 {
@@ -91,7 +150,8 @@ private void readdatastore()
             CoroutineStart.DEFAULT,
             (coroutineScope, continuation) -> {
                 try {
-                    migrationManager.getUserValueFlow("").collect((s,continuation1)->s,continuation);
+                   //String username = migrationManager.getValueFlow(migrationManager.USER_NAME, (Continuation<? super String>) continuation).collect((s, continuation1)->s,continuation);
+                   String username = (String)  MigrationManager.getValueFlow(MigrationManager.USER_NAME, (Continuation<? super String>) continuation);
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -100,20 +160,21 @@ private void readdatastore()
             }
     );
 }
-/*private void editdatastore(){
+private void editdatastore(){
     BuildersKt.launch(GlobalScope.INSTANCE,
             Dispatchers.getIO(),//context to be ran on
             CoroutineStart.DEFAULT,
             (coroutineScope, continuation) -> {
                 try {
-                    migrationManager.setValue(username,"");
+                       MigrationManager.setValue(MigrationManager.USER_NAME,t2.getText().toString(), (Continuation<? super Unit>) continuation);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                return null;
             }
     );
 }*/
-    public void checkexistedrecord()
+   public void checkexistedrecord()
     {
         SharedPreferences sp=getSharedPreferences("credentials",MODE_PRIVATE);
           if(sp.contains("username"))
