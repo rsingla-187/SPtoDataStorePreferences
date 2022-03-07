@@ -3,18 +3,16 @@ package com.kazimasum.spdemo
 //import androidx.datastore.DataStore
 import android.content.Context
 import androidx.datastore.preferences.*
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import java.io.IOException
+import kotlinx.coroutines.flow.first
+import kotlin.coroutines.Continuation
 
-object MigrationManager {
+public object MigrationManager {
 
-    val USER_PREFERENCES_NAME = "credentials"
-
-    private val Context.dataStore by preferencesDataStore(
+        val USER_PREFERENCES_NAME = "credentials"
+init {
+    val Context.dataStore by preferencesDataStore(
         name = USER_PREFERENCES_NAME,
         produceMigrations = { context ->
             // Since we're migrating from SharedPreferences, add a migration based on the
@@ -22,41 +20,82 @@ object MigrationManager {
             listOf(SharedPreferencesMigration(context, USER_PREFERENCES_NAME))
         }
     )
+}
 
-    fun getStringPreferenceValueForKey(context: Context, key: String, callback: (String?) -> Unit) {
+   @JvmStatic
+      fun getUserValueFlow(
+        username: String,
+        continuation: Continuation<String>
+    ):String? {
+        var key: String? =null
         CoroutineScope(Dispatchers.IO).launch {
-            context.dataStore.data
-                .catch { exception ->
-                    if (exception is IOException) {
-                        emit(emptyPreferences())
-                    } else {
-                        throw exception
-                    }
-                }.collect { preferences ->
-                    callback(preferences[stringPreferencesKey(key)])
-                }
+          key= async {
+              getValueFlow(username)
+          }.toString()
         }
+        return key
     }
+
 
     @JvmStatic
     fun setUserValue(
-        context: Context,
         username: String,
-        value: String
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            return@launch setValue(context, username, value)
+        value: String,
+        continuation: Continuation<Unit>
+    )  {
+        CoroutineScope(Dispatchers.IO).launch{
+          return@launch setValue(username, value)
         }
-    }
-
-    @JvmStatic
-    private suspend fun setValue(context: Context, key: String, value: String) {
+     }
+    suspend fun getValueFlow(key: String): String? =withContext(Dispatchers.IO) {
         val dataStoreKey = stringPreferencesKey(key)
-        context.dataStore.edit { preferences ->
+        val preferences = dataStore.data.first()
+        return@withContext preferences[dataStoreKey]
+    }
+    @JvmStatic
+    suspend fun setValue(key: String, value: String) {
+        val dataStoreKey = stringPreferencesKey(key)
+        dataStore.edit { preferences ->
             preferences[dataStoreKey] = value
         }
     }
+    /*suspend fun <T> DataStore<Preferences>.getValueFlow(
+        key: String
+    ): String? {
+        val dataStoreKey = preferencesKey<String>(key)
+        val preferences = dataStore.data.first()
+        return preferences[dataStoreKey]
+    *//*this.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences ->
+                preferences[dataStoreKey]
+            }*//*
+    }*/
+   /* @JvmStatic
+    suspend fun getValueFlow(key: String): String? {
+        val dataStoreKey = preferencesKey<String>(key)
+        val preferences = dataStore.data.first()
+        return preferences[dataStoreKey]
+    }
+
+    @JvmStatic
+    suspend fun setValue(key: String, value: String) {
+        val dataStoreKey = preferencesKey<String>(key)
+        dataStore.edit { preferences ->
+            preferences[dataStoreKey] = value.toString()
+        }
+    }*/
+
+
+   // const val USER_PREFERENCES_NAME = "credentials"
 
     const val USER_NAME = "username"
     const val PASS_WORD = "password"
+object PreferencesKeys {
+}
 }
