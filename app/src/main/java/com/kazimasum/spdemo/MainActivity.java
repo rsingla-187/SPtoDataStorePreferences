@@ -41,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
         edit_dp = (Button) findViewById(R.id.edit_dp);
 
 
-           checkexistedrecord();
+      //  checkexistedrecord();
 
-        /*savebtn.setOnClickListener(new View.OnClickListener() {
+       /* savebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
                 tv.setTextColor(Color.GREEN);
                 tv.setText("Insreted Successfully");
             }
-        });*/
-    /*    delbtn.setOnClickListener(new View.OnClickListener() {
+        });
+        delbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SharedPreferences sp = getSharedPreferences("credentials", MODE_PRIVATE);
@@ -74,48 +74,44 @@ public class MainActivity extends AppCompatActivity {
                 tv.setText("Deleted Successfully");
             }
         });
-*/
-        mgrt_sp.setOnClickListener(new View.OnClickListener() {
+*/       /* mgrt_sp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MigrationManager.MigrateSp(context);
                 tv.setTextColor(Color.GREEN);
                 tv.setText("Migrated Successfully");
             }
-        });
+        });*/
 
-       read_dp.setOnClickListener(new View.OnClickListener() {
+        read_dp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AtomicReference<String> username = null;
+
                 BuildersKt.launch(GlobalScope.INSTANCE,
                         Dispatchers.getIO(),//context to be ran on
                         CoroutineStart.DEFAULT,
                         (coroutineScope, continuation) -> {
                             try {
-                                //String username = migrationManager.getValueFlow(migrationManager.USER_NAME, (Continuation<? super String>) continuation).collect((s, continuation1)->s,continuation);
-                                username.set( MigrationManager.getUserValueFlow(MigrationManager.USER_NAME, (Continuation<? super String>) continuation));
-                                if(username!=null)
-                                {
+                              String username=   MigrationManager.INSTANCE.getUserValueFlow(MigrationManager.USER_NAME, (Continuation<? super String>) continuation);
+                              //  username.set(MigrationManager.getUserValueFlow(MigrationManager.USER_NAME, (Continuation<? super String>) continuation));
+                                if (username != null) {
                                     t1.setText((CharSequence) username);
-                                   // t2.setText(sp.getString("password",""));
+                                    // t2.setText(sp.getString("password",""));
                                     tv.setTextColor(Color.GREEN);
                                     tv.setText("Read Successfully");
-                                }
-                                else {
+                                } else {
                                     tv.setText("Record not found");
                                     tv.setTextColor(Color.RED);
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            return username;
+                            return null;
                         }
                 );
             }
         });
-
-     /*   edit_dp.setOnClickListener(new View.OnClickListener() {
+    /*   edit_dp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 BuildersKt.launch(GlobalScope.INSTANCE,
@@ -124,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                         (coroutineScope, continuation) -> {
                             try {
 
-                                MigrationManager.setValue(MigrationManager.USER_NAME, t2.getText().toString(), (Continuation<? super Unit>) continuation);
+                                MigrationManager.setUserValue(MigrationManager.USER_NAME, t1.getText().toString(), (Continuation<? super Unit>) continuation);
                                 tv.setTextColor(Color.GREEN);
                                 tv.setText("Edited Successfully");
                             } catch (Exception e) {
@@ -134,10 +130,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                 );
             }
-        });*/
+        });
 
     }
-
+*/
     /*private void migrateToPreferencesDataStore() {
        // val USERNAME = preferencesKey<String>(username)
 
@@ -174,6 +170,7 @@ private void editdatastore(){
             }
     );
 }*/
+    }
    public void checkexistedrecord()
     {
         SharedPreferences sp=getSharedPreferences("credentials",MODE_PRIVATE);

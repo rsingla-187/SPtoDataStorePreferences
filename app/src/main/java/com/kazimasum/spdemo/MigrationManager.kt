@@ -22,12 +22,12 @@ public object MigrationManager {
             migrations = listOf(
                 SharedPreferencesMigration(
                     context,
-                    USER_PREFERENCES_NAME
+                    USER_PREFERENCES_NAME,deleteEmptyPreferences = true
                 )
             )
         )
     }
-    @JvmStatic
+   @JvmStatic
       fun getUserValueFlow(
         username: String,
         continuation: Continuation<String>
@@ -41,18 +41,28 @@ public object MigrationManager {
         return key
     }
 
-    /*
+
     @JvmStatic
     fun setUserValue(
-         defaultValue: String
-     ): Flow<String>{
-         return dataStore.setValue()
-     }*/
-
+        username: String,
+        value: String,
+        continuation: Continuation<Unit>
+    )  {
+        CoroutineScope(Dispatchers.IO).launch{
+          return@launch setValue(username, value)
+        }
+     }
     suspend fun getValueFlow(key: String): String? =withContext(Dispatchers.IO) {
         val dataStoreKey = preferencesKey<String>(key)
         val preferences = dataStore.data.first()
         return@withContext preferences[dataStoreKey]
+    }
+    @JvmStatic
+    suspend fun setValue(key: String, value: String) {
+        val dataStoreKey = preferencesKey<String>(key)
+        dataStore.edit { preferences ->
+            preferences[dataStoreKey] = value
+        }
     }
     /*suspend fun <T> DataStore<Preferences>.getValueFlow(
         key: String
