@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 );
             }
         });
-    /*   edit_dp.setOnClickListener(new View.OnClickListener() {
+       edit_dp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 BuildersKt.launch(GlobalScope.INSTANCE,
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-*/
+
     /*private void migrateToPreferencesDataStore() {
        // val USERNAME = preferencesKey<String>(username)
 
@@ -170,7 +170,7 @@ private void editdatastore(){
             }
     );
 }*/
-    }
+
    public void checkexistedrecord()
     {
         SharedPreferences sp=getSharedPreferences("credentials",MODE_PRIVATE);

@@ -1,32 +1,26 @@
 package com.kazimasum.spdemo
 
+//import androidx.datastore.DataStore
 import android.content.Context
-import androidx.datastore.DataStore
 import androidx.datastore.preferences.*
+import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import java.io.IOException
 import kotlin.coroutines.Continuation
 
 public object MigrationManager {
-    @JvmStatic
-    lateinit var dataStore: DataStore<Preferences>
+    private const val USER_PREFERENCES_NAME = "credentials"
 
-    @JvmStatic
-    fun MigrateSp(context: Context) {
-        dataStore = context.createDataStore(
-            name = USER_PREFERENCES_NAME,
-            migrations = listOf(
-                SharedPreferencesMigration(
-                    context,
-                    USER_PREFERENCES_NAME,deleteEmptyPreferences = true
-                )
-            )
-        )
-    }
+ private   val Context.dataStore by preferencesDataStore(
+        name = USER_PREFERENCES_NAME,
+        produceMigrations = { context ->
+            // Since we're migrating from SharedPreferences, add a migration based on the
+            // SharedPreferences name
+            listOf(SharedPreferencesMigration(context, USER_PREFERENCES_NAME))
+        }
+    )
+
+
    @JvmStatic
       fun getUserValueFlow(
         username: String,
@@ -53,13 +47,13 @@ public object MigrationManager {
         }
      }
     suspend fun getValueFlow(key: String): String? =withContext(Dispatchers.IO) {
-        val dataStoreKey = preferencesKey<String>(key)
+        val dataStoreKey = stringPreferencesKey(key)
         val preferences = dataStore.data.first()
         return@withContext preferences[dataStoreKey]
     }
     @JvmStatic
     suspend fun setValue(key: String, value: String) {
-        val dataStoreKey = preferencesKey<String>(key)
+        val dataStoreKey = stringPreferencesKey(key)
         dataStore.edit { preferences ->
             preferences[dataStoreKey] = value
         }
@@ -97,13 +91,10 @@ public object MigrationManager {
     }*/
 
 
-    const val USER_PREFERENCES_NAME = "credentials"
+   // const val USER_PREFERENCES_NAME = "credentials"
 
     const val USER_NAME = "username"
     const val PASS_WORD = "password"
-
-    val USERNAME = preferencesKey<String>(USER_NAME)
-    val PASSWORD = preferencesKey<String>(PASS_WORD)
-    //  val USERNAME = preferencesKey<String>(username)
-
+object PreferencesKeys {
+}
 }
