@@ -9,9 +9,10 @@ import kotlinx.coroutines.flow.first
 import kotlin.coroutines.Continuation
 
 public object MigrationManager {
-    private const val USER_PREFERENCES_NAME = "credentials"
 
- private   val Context.dataStore by preferencesDataStore(
+        val USER_PREFERENCES_NAME = "credentials"
+init {
+    val Context.dataStore by preferencesDataStore(
         name = USER_PREFERENCES_NAME,
         produceMigrations = { context ->
             // Since we're migrating from SharedPreferences, add a migration based on the
@@ -19,7 +20,7 @@ public object MigrationManager {
             listOf(SharedPreferencesMigration(context, USER_PREFERENCES_NAME))
         }
     )
-
+}
 
    @JvmStatic
       fun getUserValueFlow(
