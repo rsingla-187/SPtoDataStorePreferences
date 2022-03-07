@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         edit_dp = (Button) findViewById(R.id.edit_dp);
 
 
-      //  checkexistedrecord();
+        //  checkexistedrecord();
 
        /* savebtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,17 +94,7 @@ public class MainActivity extends AppCompatActivity {
                         CoroutineStart.DEFAULT,
                         (coroutineScope, continuation) -> {
                             try {
-                              String username=   MigrationManager.INSTANCE.getUserValueFlow(MigrationManager.USER_NAME, (Continuation<? super String>) continuation);
-                              //  username.set(MigrationManager.getUserValueFlow(MigrationManager.USER_NAME, (Continuation<? super String>) continuation));
-                                if (username != null) {
-                                    t1.setText((CharSequence) username);
-                                    // t2.setText(sp.getString("password",""));
-                                    tv.setTextColor(Color.GREEN);
-                                    tv.setText("Read Successfully");
-                                } else {
-                                    tv.setText("Record not found");
-                                    tv.setTextColor(Color.RED);
-                                }
+                                MigrationManager.INSTANCE.getStringPreferenceValueForKey(MainActivity.this, MigrationManager.USER_NAME, this::userName);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -110,8 +102,19 @@ public class MainActivity extends AppCompatActivity {
                         }
                 );
             }
+
+            private Unit userName(String username) {
+                if (Looper.myLooper() != getMainLooper()) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        setFields(username);
+                    });
+                } else {
+                    setFields(username);
+                }
+                return Unit.INSTANCE;
+            }
         });
-       edit_dp.setOnClickListener(new View.OnClickListener() {
+        edit_dp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 BuildersKt.launch(GlobalScope.INSTANCE,
@@ -119,8 +122,7 @@ public class MainActivity extends AppCompatActivity {
                         CoroutineStart.DEFAULT,
                         (coroutineScope, continuation) -> {
                             try {
-
-                                MigrationManager.setUserValue(MigrationManager.USER_NAME, t1.getText().toString(), (Continuation<? super Unit>) continuation);
+                                MigrationManager.setUserValue(MainActivity.this, MigrationManager.USER_NAME, t1.getText().toString());
                                 tv.setTextColor(Color.GREEN);
                                 tv.setText("Edited Successfully");
                             } catch (Exception e) {
@@ -132,6 +134,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void setFields(String username) {
+        if (username != null) {
+            t1.setText((CharSequence) username);
+            // t2.setText(sp.getString("password",""));
+            tv.setTextColor(Color.GREEN);
+            tv.setText("Read Successfully");
+        } else {
+            tv.setText("Record not found");
+            tv.setTextColor(Color.RED);
+        }
     }
 
     /*private void migrateToPreferencesDataStore() {
@@ -171,17 +185,17 @@ private void editdatastore(){
     );
 }*/
 
-   public void checkexistedrecord()
+    public void checkexistedrecord()
     {
         SharedPreferences sp=getSharedPreferences("credentials",MODE_PRIVATE);
-          if(sp.contains("username"))
-          {
-              t1.setText(sp.getString("username",""));
-              t2.setText(sp.getString("password",""));
-          }
-          else {
-              tv.setText("Record not found");
-              tv.setTextColor(Color.RED);
-          }
+        if(sp.contains("username"))
+        {
+            t1.setText(sp.getString("username",""));
+            t2.setText(sp.getString("password",""));
+        }
+        else {
+            tv.setText("Record not found");
+            tv.setTextColor(Color.RED);
+        }
     }
 }
