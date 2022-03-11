@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
         t1 = (EditText) findViewById(R.id.t1);
         t2 = (EditText) findViewById(R.id.t2);
         tv = (TextView) findViewById(R.id.tv);
-        savebtn = (Button) findViewById(R.id.savebtn);
+        /*savebtn = (Button) findViewById(R.id.savebtn);
         delbtn = (Button) findViewById(R.id.delbtn);
-        mgrt_sp = (Button) findViewById(R.id.mgrt_sp);
+        mgrt_sp = (Button) findViewById(R.id.mgrt_sp);*/
         read_dp = (Button) findViewById(R.id.read_dp);
         edit_dp = (Button) findViewById(R.id.edit_dp);
 
